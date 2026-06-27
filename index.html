@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔎 AI 과학수사대</title>
+  <!-- Google Fonts: Noto Sans KR, Black Han Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* 밝은 흰색 배경 테마를 위한 CSS 스타일 */
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel2: #f1f4fa;
+      --line: #cbd5e1;
+      --ink: #1e293b;
+      --dim: #475569;
+      --cyan: #0284c7;
+      --cyan-light: #e0f2fe;
+      --cyan2: #38bdf8;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --green: #22c55e;
+      --shadow: rgba(148, 163, 184, 0.15);
+      --purple: #8b5cf6;
+      --purple-light: #f3e8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      background-color: var(--bg);
+      /* 밝은 그라데이션 데코레이션 */
+      background-image: 
+        radial-gradient(900px 500px at 80% -10%, rgba(14, 165, 233, 0.1), transparent 60%),
+        radial-gradient(700px 500px at 0% 110%, rgba(139, 92, 246, 0.1), transparent 60%);
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.3;
+    }
+
+    /* 인트로(시작) 화면 디자인 */
+    .intro-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 5px 10px;
+    }
+
+    .intro-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 820px; 
+      box-shadow: 0 12px 35px var(--shadow);
+      animation: pop 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .intro-img-wrap {
+      width: 100%;
+      height: auto;
+      max-height: 460px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--panel2);
+    }
+
+    .intro-img-wrap img {
+      width: 100%;
+      height: 100%;
+      max-height: 460px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .intro-bottom-content {
+      text-align: left; /* 왼쪽 정렬 수정 */
+      padding: 0 8px 8px;
+    }
+
+    .intro-bottom-content .school {
+      font-weight: 500;
+      font-size: 1.0rem;
+      color: var(--ink);
+      margin-bottom: 6px;
+      letter-spacing: 2.0px;
+    }
+
+    .intro-bottom-content .date {
+      font-size: 1.0rem;
+      font-weight: 500;
+      color: var(--dim);
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    .start-btn {
+      width: 100%;
+      max-width: 300px;
+      font-size: 1.3rem !important;
+      padding: 13px 24px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.25);
+      font-weight: 700;
+      margin: 0 auto;
+      display: block;
+      text-align: center;
+    }
+
+    /* 메인 랩 디자인 */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 22px 16px 70px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #0369a1;
+      background: var(--cyan-light);
+      padding: 5px 16px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: 'Black Han Sans', sans-serif;
+      font-weight: 400;
+      font-size: clamp(1.8rem, 6vw, 2.8rem);
+      margin: 0.1em 0;
+      background: linear-gradient(180deg, #0f172a, var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .sub {
+      color: var(--dim);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    nav {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin: 18px 0 4px;
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      color: var(--dim);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+      font-size: 0.95rem;
+    }
+
+    nav button.on {
+      color: #ffffff;
+      background: linear-gradient(180deg, var(--cyan2), var(--cyan));
+      border-color: transparent;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+    }
+
+    nav button.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background-color: #f1f5f9;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .toast {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--red);
+      color: #b91c1c;
+      border-radius: 10px;
+      padding: 11px 14px;
+      margin: 10px 0;
+      animation: shake 0.4s;
+    }
+
+    .win {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid var(--green);
+      color: #15803d;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 10px 0;
+      text-align: center;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 14px;
+      box-shadow: 0 10px 30px var(--shadow);
+      display: none;
+    }
+
+    .panel.show {
+      display: block;
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    h2 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin: 0 0 6px;
+      color: var(--ink);
+    }
+
+    h3 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      color: var(--ink);
+      font-size: 1.15rem;
+      margin: 22px 0 10px;
+    }
+
+    .lead {
+      color: var(--dim);
+      margin: 0 0 16px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+    }
+
+    .status-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .q {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .q p {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .opts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .opts button {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    .opts button:hover {
+      background: var(--panel2);
+    }
+
+    .opts button.right {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: var(--green);
+      color: #166534;
+    }
+
+    .opts button.wrong {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: var(--red);
+      color: #991b1b;
+    }
+
+    .fb {
+      margin-top: 10px;
+      font-size: 0.92rem;
+      min-height: 18px;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    .pill {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      padding: 6px 14px;
+      border-radius: 999px;
+      color: var(--ink);
+    }
+
+    .pill b {
+      color: var(--cyan);
+    }
+
+    .builder {
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 24px;
+    }
+
+    @media(max-width:760px){
+      .builder {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ctrl h3 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      color: var(--cyan);
+      font-size: 1rem;
+      margin: 16px 0 8px;
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 4px;
+    }
+
+    .formrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 6px 0;
+    }
+
+    .formrow label {
+      flex: 1;
+      min-width: 140px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--dim);
+    }
+
+    .formrow input[type=text], .formrow select {
+      width: 100%;
+      margin-top: 5px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.95rem;
+    }
+
+    .emojigrid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .emojigrid button {
+      font-size: 1.4rem;
+      padding: 6px 0;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .emojigrid button:hover {
+      transform: scale(1.08);
+    }
+
+    .emojigrid button.on {
+      border-color: var(--cyan);
+      background: var(--cyan-light);
+    }
+
+    .themes {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .themes button {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .themes button:hover {
+      transform: scale(1.1);
+    }
+
+    .themes button.on {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 2px var(--cyan);
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    #camBox {
+      margin-top: 10px;
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    #cam {
+      width: 100%;
+      max-width: 260px;
+      border-radius: 12px;
+      transform: scaleX(-1);
+      background: #000;
+    }
+
+    .sliders label {
+      display: block;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--dim);
+      margin: 10px 0 2px;
+    }
+
+    .sliders input[type=range] {
+      width: 100%;
+      accent-color: var(--cyan);
+    }
+
+    .btn {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 0.92rem;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn.cyan {
+      background: linear-gradient(180deg, var(--cyan2), var(--cyan));
+      color: #ffffff;
+    }
+
+    .btn.ghost {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn.ghost:hover {
+      background: var(--panel2);
+    }
+
+    .btn.amber {
+      background: linear-gradient(180deg, #ffd27a, var(--amber));
+      color: #ffffff;
+    }
+
+    .btn.purple {
+      background: linear-gradient(180deg, #a78bfa, var(--purple));
+      color: #ffffff;
+    }
+
+    .action-footer {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .preview {
+      text-align: center;
+    }
+
+    #pcanvas {
+      width: 100%;
+      max-width: 330px;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px var(--shadow);
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .hint {
+      font-size: 0.82rem;
+      color: var(--dim);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .steps {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 14px;
+      font-size: 0.86rem;
+      color: var(--dim);
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .steps b {
+      color: var(--cyan);
+    }
+
+    /* ③ 사건 해결하기 및 ④ 과학수사관 어때? 스타일 */
+    .case-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .case-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--cyan);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 티셔츠 그래픽 구조 */
+    .tshirt-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .tshirt-card {
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--panel2);
+      transition: all 0.2s;
+    }
+
+    .tshirt-card:hover {
+      border-color: var(--cyan2);
+    }
+
+    .tshirt-card.selected {
+      border-color: var(--cyan);
+      background: var(--cyan-light);
+    }
+
+    .tshirt-shape {
+      width: 60px;
+      height: 60px;
+      background: #e2e8f0;
+      margin: 0 auto 10px;
+      position: relative;
+      clip-path: polygon(15% 0%, 30% 0%, 50% 15%, 70% 0%, 85% 0%, 100% 20%, 85% 35%, 85% 100%, 15% 100%, 15% 35%, 0% 20%);
+    }
+
+    /* 화학 발광 연출 */
+    .tshirt-card.selected.luminol .tshirt-shape {
+      background: #2563eb;
+      box-shadow: inset 0 0 20px #22d3ee, 0 0 15px #38bdf8;
+      animation: glow 1.5s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 2px #06b6d4); }
+      to { filter: drop-shadow(0 0 8px #22d3ee); }
+    }
+
+    .suspect-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* 5개의 버튼이 항상 한 줄로 정렬되도록 고정 */
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .suspect-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 72px;
+      padding: 10px 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+      transition: 0.2s;
+      line-height: 1.35;
+    }
+
+    .suspect-btn.checked {
+      background: var(--cyan-light);
+      border-color: var(--cyan);
+      color: #0369a1;
+    }
+
+    .suspect-role {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--dim);
+      margin-top: 3px;
+    }
+
+    .suspect-btn.checked .suspect-role {
+      color: #0284c7;
+    }
+
+    /* 화면이 좁은 모바일 기기를 위한 반응형 폰트 및 패딩 조절 */
+    @media(max-width: 640px) {
+      .suspect-grid {
+        gap: 4px; /* 모바일에서는 간격을 좁혀 한 줄 배열을 유지 */
+      }
+      .suspect-btn {
+        font-size: 0.72rem;
+        padding: 6px 2px;
+        min-height: 64px;
+        border-radius: 8px;
+      }
+      .suspect-role {
+        font-size: 0.62rem;
+        margin-top: 1px;
+      }
+    }
+
+    /* 족적 분석 모의 그래픽 */
+    .footprint-graphic {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 16px;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    /* DNA 감식 이미지 스타일 */
+    .dna-image-wrap {
+      text-align: center;
+      /*background: #1e293b;*/
+      /*border-radius: 12px;*/
+      padding: 14px;
+      margin: 10px 0;
+    }
+
+    .dna-image-wrap img {
+      max-width: 100%;
+      height: auto;
+      /*border-radius: 8px;*/
+      /*border: 1px solid var(--line);*/
+    }
+
+    /* 보석 찾기 3D 회전 금고 사진 카드 */
+    .safe-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .safe-card {
+      height: 240px; /* 고정 크기로 3장의 카드 크기 일치 */
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .safe-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .safe-card.flipped .safe-inner {
+      transform: rotateY(180deg);
+    }
+
+    .safe-front, .safe-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 11px;
+      overflow: hidden;
+    }
+
+    .safe-front {
+      background: #ffffff; /* 흰색 배경으로 통일 */
+      color: var(--ink);
+    }
+
+    .safe-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* 이미지 비율 유지하며 찌그러짐 없이 온전히 나오도록 수정 */
+      background: #ffffff;
+    }
+
+    .safe-back {
+      background: #0f172a;
+      color: #ffffff;
+      transform: rotateY(180deg);
+      padding: 10px;
+    }
+
+    /* 진로 자가 검사 설문 */
+    .survey-q {
+      background: var(--panel2);
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .survey-q p {
+      margin: 0 0 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .survey-opts {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .survey-opts button {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.1s;
+    }
+
+    .survey-opts button.active {
+      background: var(--purple);
+      color: white;
+      border-color: var(--purple);
+    }
+
+    .foot {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.78rem;
+      margin-top: 35px;
+    }
+
+    /* ==========================================
+       ★ 인쇄 전용 레이아웃 및 스타일 디자인 ★
+       ========================================== */
+    #report-print-area {
+      display: none;
+    }
+
+    @media print {
+      /* 웹 페이지 레이아웃 숨기기 */
+      body {
+        background-color: #ffffff !important;
+        background-image: none !important;
+        color: #000000 !important;
+      }
+      .stars, #intro, #mainWrap, .foot {
+        display: none !important;
+      }
+      
+      /* 인쇄용 영역 활성화 */
+      #report-print-area {
+        display: block !important;
+        width: 100%;
+        max-width: 210mm; /* A4 가로폭 규격 */
+        margin: 0 auto;
+        padding: 5mm 10mm;
+        box-sizing: border-box;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Noto Sans KR', sans-serif;
+      }
+
+      /* 배경색 및 보더 고정 강제 설정 */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+    }
+
+    /* 보고서 내부 세부 스타일 */
+    .print-header {
+      text-align: center;
+      border-bottom: 2px solid #000000;
+      padding-bottom: 10px;
+      margin-bottom: 18px;
+    }
+
+    .print-header h1 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      color: #000000 !important;
+      font-size: 2.2rem;
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    .print-profile-section {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      background: #f8fafc;
+    }
+
+    .print-id-card-img-container {
+      width: 140px;
+      height: 191px; /* 대원증 비율 1:1.36 */
+      border: 1px solid #94a3b8;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .print-id-card-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .print-profile-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .print-profile-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .print-profile-table th, .print-profile-table td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .print-profile-table th {
+      font-weight: 700;
+      color: #1e293b;
+      width: 110px;
+    }
+
+    .print-profile-table td {
+      color: #334155;
+    }
+
+    .print-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0284c7;
+      border-left: 4px solid #0284c7;
+      padding-left: 8px;
+      margin: 15px 0 8px;
+    }
+
+    .print-log-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+    }
+
+    .print-log-table th, .print-log-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    .print-log-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .print-log-table td {
+      text-align: left;
+    }
+
+    .print-log-status {
+      text-align: center !important;
+      font-weight: 700;
+    }
+
+    .print-success-badge {
+      color: #15803d;
+      background: #dcfce7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .print-fail-badge {
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .print-career-result {
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      background: #faf5ff;
+      margin-bottom: 18px;
+    }
+
+    .print-career-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #6d28d9;
+      margin-bottom: 6px;
+    }
+
+    .print-career-desc {
+      font-size: 0.85rem;
+      color: #475569;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .print-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #94a3b8;
+      padding-top: 12px;
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .print-signature-box {
+      border: 1px solid #cbd5e1;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-align: center;
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <!-- 은은한 별 효과 데코레이션 배경 -->
+  <canvas class="stars" id="stars"></canvas>
+  
+  <!-- 인트로 화면 -->
+  <div id="intro" class="intro-container">
+    <div class="intro-card">
+      <div class="intro-img-wrap">
+        <img src="images/start.png" alt="Artemis Start" id="startImg" onerror="this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1920'; this.onerror=null;">
+      </div>
+      
+      <div class="intro-bottom-content">
+        <div class="school">🏫 윤중중학교</div>
+        <div class="date">📅 2026. 07. 10. (금)</div>
+        <button class="btn cyan start-btn" onclick="startApp()">START</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 애플리케이션 랩 -->
+  <div class="wrap" id="mainWrap" style="display: none;">
+    <header>
+      <span class="badge">★ 2026 중고등진로교실 | 과학수사관 ★</span>
+      <h1>박물관 보석 도난 사건을 해결하라!</h1>
+      <div class="sub">박물관 특별 전시 기간 중 Hope Diamond가 도난당했습니다. <br> 주어진 증거를 분석하여 범인과 사라진 보석의 행방을 밝혀내세요! </div>
+    </header>
+
+    <nav id="nav">
+      <button data-tab="quiz" class="on">① 사전 테스트</button>
+      <button data-tab="pass" id="navPass" class="locked">🔒 ② 과학수사대원증</button>
+      <button data-tab="resolve" id="navResolve" class="locked">🔒 ③ 사건 해결하기</button>
+      <button data-tab="career" id="navCareer" class="locked">🔒 ④ 과학수사관 어때?</button>
+    </nav>
+
+    <!-- 퀴즈 섹션 (4문제) -->
+    <section class="panel show" id="quiz">
+      <h2>① 과학수사관의 첫 번째 능력, 관찰력(4문제)</h2>
+      <p class="lead">사건 현장을 주의 깊게 관찰하고 물음에 답해보세요. <b>4문제를 전부 맞혀야</b> 과학수사대원증을 만들 수 있습니다! 틀려도 괜찮아요 — 다시 도전할 수 있어요.</p>
+      <div class="status-row">
+        <span class="pill">문제 <b id="qn">1</b> / <b id="tot">4</b></span>
+        <span class="pill">맞힘 <b id="sc">0</b></span>
+        <button class="btn ghost" onclick="Q.reset()">처음부터 다시</button>
+      </div>
+      <div id="qbox"></div>
+      <div id="qresult"></div>
+    </section>
+
+    <!-- 과학수사대원증 섹션 -->
+    <section class="panel" id="pass">
+      <h2>과학수사대원증</h2>
+      <p class="lead">정보·아바타·사진을 골라 과학수사대원증을 만들고, <b>PNG로 저장</b>해 패들렛에 올려요!</p>
+      
+      <div class="builder">
+        <div class="ctrl">
+          <div class="formrow">
+            <label>이름
+              <input type="text" id="iName" placeholder="예) 홍길동" oninput="P.draw()">
+            </label>
+            <label> 소속
+              <input type="text" id="iTeam" placeholder="예) OO 중학교" oninput="P.draw()">
+            </label>
+          </div>
+          <div class="formrow">
+            <label>전문 분야
+              <select id="iRole" onchange="P.draw()">
+                <option>법과학 🔬</option>
+                <option>법공학 🔎</option>
+                <option>법의학 🩻</option>
+              </select>
+            </label>
+          </div>
+
+          <h3>① 카드 색상 테마</h3>
+          <div class="themes" id="themes"></div>
+
+          <h3>② 아바타 — 이모지 고르기</h3>
+          <div class="emojigrid" id="emojis"></div>
+
+          <h3>③ 아바타 — 셀카 / 사진 쓰기</h3>
+          <div class="photo-actions">
+            <button class="btn cyan" onclick="P.cam()">📸 셀카 찍기</button>
+            <button class="btn ghost" onclick="document.getElementById('iPhoto').click()">📷 사진 올리기</button>
+            <button class="btn amber" onclick="P.auto()">✨ 자동 보정</button>
+            <button class="btn ghost" onclick="P.useEmoji()">이모지로 되돌리기</button>
+          </div>
+          <input type="file" id="iPhoto" accept="image/*" style="display:none">
+          
+          <div id="camBox" style="display:none;">
+            <video id="cam" autoplay playsinline muted></video>
+            <div style="margin-top:8px">
+              <button class="btn cyan" onclick="P.snap()">📸 찰칵!</button>
+              <button class="btn ghost" onclick="P.closeCam()">닫기</button>
+            </div>
+            <div id="camMsg" class="hint"></div>
+          </div>
+          
+          <div class="sliders">
+            <label>밝기 <input type="range" id="sBri" min="60" max="160" value="100" oninput="P.draw()"></label>
+            <label>대비 <input type="range" id="sCon" min="60" max="160" value="100" oninput="P.draw()"></label>
+            <label>채도 <input type="range" id="sSat" min="0" max="200" value="100" oninput="P.draw()"></label>
+          </div>
+          <div class="hint">사진은 내 기기에 올린 파일만 사용해요(인터넷 사진은 마음에 드는 화면을 <b>캡처해서</b> 올리면 돼요).</div>
+
+          <h3>④ 저장 & 공유</h3>
+          <div class="action-footer">
+            <button class="btn cyan" onclick="P.save()">💾 PNG로 저장</button>
+            <button class="btn ghost" onclick="window.open('https://padlet.com/haneulbori/ai-91iki6f6t27smqf9','_blank')">🔗 패들렛 열기</button>
+            <button class="btn ghost" onclick="window.print()">🖨 인쇄</button>
+          </div>
+        </div>
+
+        <div class="preview">
+          <canvas id="pcanvas" width="660" height="900"></canvas>
+          <div class="steps">
+            <b>패들렛 올리는 순서</b><br>
+            1) 정보 입력 → 2) 아바타/사진 선택 → 3) 💾 PNG로 저장 → 4) 패들렛에서 <b>+ 게시물</b> → 저장한 그림 첨부 → 게시!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ 사건 해결하기 섹션 -->
+    <section class="panel" id="resolve">
+      <h2>③ 사건 해결하기</h2>
+      <p class="lead">현장에서 수집된 증거를 분석하여 범인을 특정하고 사라진 보석의 위치를 밝혀내세요!</p>
+
+      <!-- [증거 1] 혈흔 검사 -->
+      <div class="case-card">
+        <div class="case-title">🩸 [증거 1] 혈흔 감식</div>
+        <p class="lead">박물관 내부를 조사하다 혈흔처럼 보이는 얼룩이 묻은 티셔츠 3장을 찾아냈습니다. 눈으로는 얼룩이 구별되지 않습니다. <b>루미놀 시약</b>을 뿌렸을 때 혈흔과 반응(청백색의 발광)을 일으키는 티셔츠를 찾아내세요!</p>
+        
+        <div class="tshirt-container">
+          <div class="tshirt-card" onclick="selectTshirt('A', this)">
+            <div class="tshirt-shape"></div>
+            <strong>티셔츠 A</strong>
+          </div>
+          <div class="tshirt-card" onclick="selectTshirt('B', this)">
+            <div class="tshirt-shape"></div>
+            <strong>티셔츠 B</strong>
+          </div>
+          <div class="tshirt-card" onclick="selectTshirt('C', this)">
+            <div class="tshirt-shape"></div>
+            <strong>티셔츠 C</strong>
+          </div>
+        </div>
+        <div id="tshirtFeedback" class="fb" style="margin: 10px 0;"></div>
+
+        <!-- 올바른 티셔츠가 선택되어 피드백 문장이 노출된 후 용의자 찾기 탭이 등장하도록 구성 -->
+        <div id="evidence1SuspectArea" style="display: none; border-top: 1px dashed var(--line); padding-top: 15px; margin-top: 15px;">
+          <p class="lead">🔍 <b>이 결과로 의심되는 용의자는?</b></p>
+          <div class="suspect-grid" id="suspectsE1">
+            <div class="suspect-btn" onclick="toggleSuspect('E1', 'A')">용의자 A<br><span class="suspect-role">경비원</span></div>
+            <div class="suspect-btn" onclick="toggleSuspect('E1', 'B')">용의자 B<br><span class="suspect-role">박물관 회원</span></div>
+            <div class="suspect-btn" onclick="toggleSuspect('E1', 'C')">용의자 C<br><span class="suspect-role">유튜버</span></div>
+            <div class="suspect-btn" onclick="toggleSuspect('E1', 'D')">용의자 D<br><span class="suspect-role">박물관 직원</span></div>
+            <div class="suspect-btn" onclick="toggleSuspect('E1', 'E')">용의자 E<br><span class="suspect-role">보석 세공사</span></div>
+          </div>
+          <div id="e1Feedback" class="fb" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <!-- [증거 2] 족적 분석 -->
+      <div class="case-card">
+        <div class="case-title">👣 [증거 2] 족적 분석</div>
+        <p class="lead">창문 근처 흙밭에 찍혀진 범인의 발자국 길이를 실측한 결과 약 <b>266mm</b>였습니다. 발 길이와 실제 신장의 상관관계를 다루는 머신러닝 기법인 <b>선형회귀</b> 공식을 분석하여 범인의 예상 키를 계산하세요.</p>
+        
+        <div style="background: var(--cyan-light); padding: 12px; border-radius: 12px; margin-bottom: 12px; font-size: 0.9rem;">
+          💡 <strong>선형회귀 실습 도구:</strong> 
+          아래 링크를 열어 수많은 표본 데이터가 일차함수 y = ax + b로 어떻게 수렴해 나가는지 관찰해볼 수 있습니다!<br>
+          <a href="https://codap.concord.org" target="_blank" style="color: var(--cyan); font-weight: bold; text-decoration: underline;">👉 CODAP 실습</a>
+        </div>
+
+        <div class="footprint-graphic">
+          [계산 방법 안내]<br>
+          ① 위 CODAP 실습 사이트에서 발 길이-키 표본 데이터를 직접 분석하여 나만의 일차함수(선형회귀식) y = ax + b를 구하세요.<br>
+          ② 직접 구한 식에 범인의 발 길이인 266mm를 대입하여 예상 키를 계산하세요.<br>
+          ③ 계산된 예상 키 값을 아래 입력창에 입력하세요.        </div>
+
+        <div class="formrow" style="margin-top:15px;">
+          <label style="font-size:0.95rem; display:block; width:100%;">
+            <b>직접 구한 선형회귀식으로 추정한 범인의 키(숫자만 입력, 단위: cm)</b>
+            <input type="text" id="calcHeight" placeholder="예: 170" oninput="checkHeight()" style="margin-top: 8px;">
+          </label>
+        </div>
+        <div id="heightFeedback" class="fb"></div>
+
+        <p class="lead" style="margin-top:15px;">🔍 <b>이 결과로 의심되는 용의자는?</b></p>
+        <div class="suspect-grid" id="suspectsE2">
+          <div class="suspect-btn" onclick="toggleSuspect('E2', 'A')">용의자 A<br><span class="suspect-role">경비원</span></div>
+          <div class="suspect-btn" onclick="toggleSuspect('E2', 'B')">용의자 B<br><span class="suspect-role">박물관 회원</span></div>
+          <div class="suspect-btn" onclick="toggleSuspect('E2', 'C')">용의자 C<br><span class="suspect-role">유튜버</span></div>
+          <div class="suspect-btn" onclick="toggleSuspect('E2', 'D')">용의자 D<br><span class="suspect-role">박물관 직원</span></div>
+          <div class="suspect-btn" onclick="toggleSuspect('E2', 'E')">용의자 E<br><span class="suspect-role">보석 세공사</span></div>
+        </div>
+        <div id="e2Feedback" class="fb" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- [증거 3] DNA 감식 -->
+      <div class="case-card">
+        <div class="case-title">🧬 [증거 3] DNA 감식</div>
+        <p class="lead">증거 혈흔에서 추출한 DNA와 용의자의 STR 분석 결과를 비교하여 일치 여부를 확인하세요.</p>
+        
+        <!-- 기존 패턴 코드 대신 STR 이미지 삽입 -->
+        <div class="dna-image-wrap">
+          <img src="images/dna.png" alt="현장 증거 및 용의자 STR 분석 결과" onerror="this.src='https://placehold.co/600x300/1e293b/38bdf8?text=STR+Analysis+Result'; this.onerror=null;">
+        </div>
+
+        <p class="lead" style="margin-top: 15px;">🔍 <b>이 결과로 최종 판명된 박물관 도난 사건의 범인은 누구인가요?</b></p>
+        <div class="suspect-grid" id="suspectsE3">
+          <div class="suspect-btn" onclick="selectFinalCulprit('A')">용의자 A<br><span class="suspect-role">경비원</span></div>
+          <div class="suspect-btn" onclick="selectFinalCulprit('B')">용의자 B<br><span class="suspect-role">박물관 회원</span></div>
+          <div class="suspect-btn" onclick="selectFinalCulprit('C')">용의자 C<br><span class="suspect-role">유튜버</span></div>
+          <div class="suspect-btn" onclick="selectFinalCulprit('D')">용의자 D<br><span class="suspect-role">박물관 직원</span></div>
+          <div class="suspect-btn" onclick="selectFinalCulprit('E')">용의자 E<br><span class="suspect-role">보석 세공사</span></div>
+        </div>
+        <div id="e3Feedback" class="fb" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- [증거 4] 암호 해독 및 보석 찾기 -->
+      <div class="case-card">
+        <div class="case-title">🔑 [증거 4] 암호 해독 및 보석 찾기</div>
+        <p class="lead">범인은 보석을 숨긴 후 위치를 잊지 않기 위해 암호를 사용하여 적어 두었습니다. 암호를 해독하여 장소(영문 대문자 5글자)를 알아내세요!</p>
+        
+        <div class="footprint-graphic" style="text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
+          암호 코드 : <b>□  □  □  □  □</b>
+        </div>
+        
+        <div class="formrow" style="margin-top: 15px;">
+          <label style="font-size:0.95rem; display:block; width:100%;">
+            <b>암호 해독 단어 (영문 대문자 5글자 입력)</b>
+            <input type="text" id="cipherText" placeholder="예: SAFE" oninput="checkCipher()" style="margin-top: 8px;">
+          </label>
+        </div>
+        <div id="cipherFeedback" class="fb"></div>
+
+        <p class="lead" style="margin-top: 20px;">📦 <b>단서가 가리키는 것을 다음의 사진 중에서 클릭하여 Hope Diamond를 회수하세요! 보석을 찾으면 ④ 과학수사관 어때? 탭의 잠금이 최종 해제됩니다.</b></p>
+        
+        <div class="safe-grid">
+          <div class="safe-card" onclick="flipSafe(1, this)">
+            <div class="safe-inner">
+              <div class="safe-front">
+                <img src="images/card1.png" alt="금고 사진 1" onerror="this.src='https://placehold.co/150x150/f1f4fa/1e293b?text=%F0%9F%93%A6+Card+1'; this.onerror=null;">
+              </div>
+              <div class="safe-back">
+                <p>💨 비어있음</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="safe-card" onclick="flipSafe(2, this)">
+            <div class="safe-inner">
+              <div class="safe-front">
+                <img src="images/card2.png" alt="금고 사진 2" onerror="this.src='https://placehold.co/150x150/f1f4fa/1e293b?text=%F0%9F%93%A6+Card+2'; this.onerror=null;">
+              </div>
+              <div class="safe-back" style="background: radial-gradient(#0ea5e9, #0f172a);">
+                <span style="font-size: 2.2rem; filter: drop-shadow(0 0 8px #38bdf8);">💎</span>
+                <strong>보석 발견!</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="safe-card" onclick="flipSafe(3, this)">
+            <div class="safe-inner">
+              <div class="safe-front">
+                <img src="images/card3.png" alt="금고 사진 3" onerror="this.src='https://placehold.co/150x150/f1f4fa/1e293b?text=%F0%9F%93%A6+Card+3'; this.onerror=null;">
+              </div>
+              <div class="safe-back">
+                <p>💨 비어있음</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="safeFeedback" class="fb" style="text-align:center; font-size:1.1rem; font-weight:bold;"></div>
+      </div>
+    </section>
+
+    <!-- ④ 과학수사관 어때?  섹션 -->
+    <section class="panel" id="career">
+      <h2>④ 과학수사관 어때?</h2>
+      <p class="lead">과학수사관이라는 진로에 관해 탐구해봅시다!</p>
+
+      <!-- 1 & 2 정보 영역이 상단 배치 -->
+      <div class="case-card">
+        <div class="case-title">💼 1. 어떻게 준비하나요?</div>
+        <ul style="padding-left: 20px; line-height: 1.8; font-size: 0.95rem; color: var(--ink);">
+          <li><b>중∙ 고등학교</b> : 과학과 수학을 열심히 공부해요.</li>
+          <li><b>대학교</b> : 일부 대학에 과학수사와 관련된 학과가 개설되어 있어요. 과학·공학 관련 분야를 전공하면 이 분야에 지원하기 수월해요.</li>
+          <li><b>취업</b> : 국립과학수사연구원이나 경찰과학수사대 등에서 활약할 수 있어요.</li>
+        </ul>
+
+        <div class="case-title" style="margin-top: 25px;">💡 2. 과학수사관에게 필요한 능력은?</div>
+        <ul style="padding-left: 20px; line-height: 1.8; font-size: 0.95rem; color: var(--ink);">
+          <li><b>관찰력</b> : 작은 단서도 놓치지 않고 발견하는 능력</li>
+          <li><b>분석력</b> : 증거를 바탕으로 사실을 추론하는 능력</li>
+          <li><b>책임감</b> : 정확하고 공정하게 업무를 수행하는 태도</li>
+          <li><b>문제 해결력</b> : 다양한 정보를 종합해 사건을 해결하는 능력</li>
+          <li><b>의사소통 능력</b> : 조사 결과를 명확하게 설명하고 기록하는 능력</li>
+        </ul>
+      </div>
+
+      <!-- 3 적성 테스트 영역이 하단 배치 -->
+      <div class="case-card" style="border-color: var(--purple);">
+        <div class="case-title" style="color: var(--purple);">📝 3. 나는 과학수사관에 적합할까?</div>
+        <p class="lead">각 문항을 체크하고 아래 결과 버튼을 눌러 결과를 확인해봅시다!</p>
+
+        <div class="survey-q">
+          <p>1. 나는 작은 변화나 세부 사항을 잘 발견하는 편이다.</p>
+          <div class="survey-opts" data-q="0">
+            <button onclick="scoreSurvey(0, 5, this)">매우 그렇다</button>
+            <button onclick="scoreSurvey(0, 4, this)">그렇다</button>
+            <button onclick="scoreSurvey(0, 3, this)">보통이다</button>
+            <button onclick="scoreSurvey(0, 2, this)">아니다</button>
+            <button onclick="scoreSurvey(0, 1, this)">전혀 아니다</button>
+          </div>
+        </div>
+
+        <div class="survey-q">
+          <p>2. 문제의 원인이나 결과를 논리적으로 생각하는 것을 좋아한다.</p>
+          <div class="survey-opts" data-q="1">
+            <button onclick="scoreSurvey(1, 5, this)">매우 그렇다</button>
+            <button onclick="scoreSurvey(1, 4, this)">그렇다</button>
+            <button onclick="scoreSurvey(1, 3, this)">보통이다</button>
+            <button onclick="scoreSurvey(1, 2, this)">아니다</button>
+            <button onclick="scoreSurvey(1, 1, this)">전혀 아니다</button>
+          </div>
+        </div>
+
+        <div class="survey-q">
+          <p>3. 어려운 일이 있어도 끝까지 해결하려고 노력한다.</p>
+          <div class="survey-opts" data-q="2">
+            <button onclick="scoreSurvey(2, 5, this)">매우 그렇다</button>
+            <button onclick="scoreSurvey(2, 4, this)">그렇다</button>
+            <button onclick="scoreSurvey(2, 3, this)">보통이다</button>
+            <button onclick="scoreSurvey(2, 2, this)">아니다</button>
+            <button onclick="scoreSurvey(2, 1, this)">전혀 아니다</button>
+          </div>
+        </div>
+
+        <div class="survey-q">
+          <p>4. 과학 실험이나 탐구 활동에 관심이 있다.</p>
+          <div class="survey-opts" data-q="3">
+            <button onclick="scoreSurvey(3, 5, this)">매우 그렇다</button>
+            <button onclick="scoreSurvey(3, 4, this)">그렇다</button>
+            <button onclick="scoreSurvey(3, 3, this)">보통이다</button>
+            <button onclick="scoreSurvey(3, 2, this)">아니다</button>
+            <button onclick="scoreSurvey(3, 1, this)">전혀 아니다</button>
+          </div>
+        </div>
+
+        <button class="btn purple" style="width: 100%; margin-top: 15px; font-size: 1.1rem; padding: 12px;" onclick="calculateCareerScore()">🎯 결과 확인하기</button>
+        <div id="surveyResult" style="margin-top: 15px;"></div>
+      </div>
+
+      <!-- ★ 종합 결과 보고서 출력하기 카드 ★ -->
+      <div class="case-card" style="border-color: var(--cyan); background: var(--cyan-light); margin-top: 25px; text-align: center;">
+        <div class="case-title" style="color: var(--cyan); justify-content: center; font-size: 1.25rem;">📄 나의 종합 수사 결과 보고서</div>
+        <p class="lead" style="color: var(--dim); margin-bottom: 15px;">본 프로그램의 활동 내용을 취합하여 A4 용지 규격 1장의 보고서를 출력하고 PDF로 다운로드할 수 있습니다.</p>
+        <button class="btn cyan" style="font-size: 1.1rem; padding: 12px 30px; border-radius: 12px;" onclick="prepareAndPrintReport()">📄 수사보고서 인쇄 및 PDF 저장</button>
+      </div>
+    </section>
+
+    <div class="foot">YDP 융합인재교육센터 · 2026 중고등진로교실 · 과학수사관</div>
+  </div>
+
+  <!-- =======================================================
+       ★ 인쇄 및 PDF 저장 전용 템플릿 영역 (A4 1장 최적화 레이아웃) ★
+       ======================================================= -->
+  <div id="report-print-area">
+    <div class="print-header">
+      <h1>AI 과학수사 활동 결과 보고서</h1>
+    </div>
+
+    <div class="print-section-title">👤 수사관 인적 사항</div>
+    <div class="print-profile-section">
+      <div class="print-id-card-img-container">
+        <!-- 업로드된 아바타 사진용 요소 -->
+        <img id="print-id-card-img" src="" alt="과학수사대원증" style="display: none;">
+        <!-- 이모지 선택형일 때 고화질 직접 출력용 스팬 -->
+        <span id="print-emoji-avatar" style="font-size: 5.5rem; line-height: 1; user-select: none; display: none;">🧑‍🔬</span>
+      </div>
+      <div class="print-profile-info">
+        <table class="print-profile-table">
+          <tr>
+            <th>성 명</th>
+            <td><span id="print-name">홍길동</span></td>
+            <th>소 속</th>
+            <td><span id="print-team">OO 중학교</span></td>
+          </tr>
+          <tr>
+            <th>전문 분야</th>
+            <td><span id="print-role">법과학 🔬</span></td>
+            <th>활동 일자</th>
+            <td>2026년 07월 10일</td>
+          </tr>
+          <tr>
+            <th>사전평가</th>
+            <td colspan="3"><span id="print-quiz-score">4문제 모두 정답 (관찰력 인증 완수)</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="print-section-title">🔍 사건 수사 및 단서 분석 로그</div>
+    <table class="print-log-table">
+      <thead>
+        <tr>
+          <th style="width: 15%;">구분</th>
+          <th style="width: 25%;">수사 증거 및 기법</th>
+          <th style="width: 45%;">수사 및 추론 결과</th>
+          <th style="width: 15%;">상태</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center; font-weight: 700;">증거 1</td>
+          <td><b>혈흔 감식</b><br>(루미놀 시약 반응)</td>
+          <td>티셔츠 B에서 화학 발광(청백색 발광) 확인 완료. 범인은 배포 기록상 박물관 직원 혹은 정기 회원으로 특정됨.</td>
+          <td class="print-log-status" id="print-status-e1"><span class="print-success-badge">분석 완료</span></td>
+        </tr>
+        <tr>
+          <td style="text-align: center; font-weight: 700;">증거 2</td>
+          <td><b>족적 분석</b><br>(머신러닝 선형회귀)</td>
+          <td>발자국 실측 길이 266mm를 직접 구한 선형회귀식에 대입한 결과, 범인의 예상 신장은 약 <b id="print-height-val">178</b>cm로 추론 완료.</td>
+          <td class="print-log-status" id="print-status-e2"><span class="print-success-badge">추론 완료</span></td>
+        </tr>
+        <tr>
+          <td style="text-align: center; font-weight: 700;">증거 3</td>
+          <td><b>DNA 감식</b><br>(STR 분석법)</td>
+          <td>수집 혈흔 추출 유전자와 용의자 대조 결과, 분석 그래프와 일치율이 완벽히 매치되는 <b>용의자 B(박물관 회원)</b>가 진범으로 판명됨.</td>
+          <td class="print-log-status" id="print-status-e3"><span class="print-success-badge">검거 성공</span></td>
+        </tr>
+        <tr>
+          <td style="text-align: center; font-weight: 700;">증거 4</td>
+          <td><b>보석 회수</b><br>(암호 해독 및 탐색)</td>
+          <td>암호 해독을 통해 위치 키워드 <b>'COFFIN'</b> 복호화 완료. 박물관 전시실 관 보관함 내부에서 도난당한 Hope Diamond 안전하게 회수함.</td>
+          <td class="print-log-status" id="print-status-e4"><span class="print-success-badge">회수 완료</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="print-section-title">📝 수사 진로 적성 종합 진단</div>
+    <div class="print-career-result">
+      <div class="print-career-title" id="print-career-title">🧬 찰떡궁합 과학수사관! (20점 / 20점)</div>
+      <div class="print-career-desc" id="print-career-desc">
+        호기심과 논리력, 끈기까지 고루 갖춘 당신은 과학수사 연구 인재나 명예 요원으로 활약하기에 최적화된 우수한 자질을 갖고 있습니다!
+      </div>
+    </div>
+
+    <div class="print-footer">
+      <div>위 보고서는 인공지능 기반 과학수사 체험 실습을 이수하고 사건을 성공적으로 해결한 기록임을 확인합니다.</div>
+    </div>
+  </div>
+
+  <script>
+    // 배경 데코레이션: 은은하게 반짝이는 별 효과 구현
+    (function(){
+      const c = document.getElementById('stars'), x = c.getContext('2d');
+      function rs(){
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+      }
+      rs();
+      window.addEventListener('resize', rs);
+      const st = [...Array(80)].map(() => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 1.5 + 0.2,
+        a: Math.random()
+      }));
+      (function loop(){
+        x.clearRect(0, 0, c.width, c.height);
+        st.forEach(s => {
+          s.a += (Math.random() - 0.5) * 0.05;
+          s.a = Math.max(0.1, Math.min(0.8, s.a));
+          x.beginPath();
+          x.arc(s.x, s.y, s.r, 0, 7);
+          x.fillStyle = 'rgba(2, 132, 199, ' + s.a + ')';
+          x.fill();
+        });
+        requestAnimationFrame(loop);
+      })();
+    })();
+
+    // 인트로 화면에서 메인 앱으로 진입하는 함수
+    function startApp() {
+      document.getElementById('intro').style.display = 'none';
+      const mainWrap = document.getElementById('mainWrap');
+      mainWrap.style.display = 'block';
+      if (typeof P !== 'undefined') {
+        P.draw();
+      }
+    }
+
+    // 자격 획득 및 탭 이동 상태 변수
+    let unlocked = false;
+    let unlockedResolve = false;  // ③ 사건 해결하기 잠금 상태
+    let unlockedCareer = false;   // ④ 과학수사관 어때? 잠금 상태
+
+    // 과학수사대원증 빌더 잠금 해제 기능
+    function unlock(){
+      unlocked = true;
+      const nb = document.getElementById('navPass');
+      nb.classList.remove('locked');
+      nb.textContent = '🎫 ② 과학수사대원증';
+    }
+
+    // 과학수사대원증 바로 이동
+    function goPassport(){
+      if(unlocked) {
+        document.getElementById('navPass').click();
+      }
+    }
+
+    // 커스텀 글로벌 토스트 메시지
+    function showGlobalToast(msg) {
+      let t = document.getElementById('globalToast');
+      if(!t) {
+        t = document.createElement('div');
+        t.id = 'globalToast';
+        t.style.cssText = "position:fixed; top:25px; left:50%; transform:translateX(-50%); z-index:9999; background:rgba(30, 41, 59, 0.95); color:#ffffff; border:1px solid var(--line); padding:14px 28px; border-radius:14px; font-weight:700; box-shadow:0 12px 30px rgba(0,0,0,0.15); font-size:0.95rem; pointer-events:none; transition: opacity 0.3s ease; text-align:center;";
+        document.body.appendChild(t);
+      }
+      t.innerHTML = msg;
+      t.style.opacity = '1';
+      clearTimeout(t.timer);
+      t.timer = setTimeout(() => {
+        t.style.opacity = '0';
+      }, 3500);
+    }
+
+    // 상단 탭 전환 처리 (잠금 체크 추가)
+    document.getElementById('nav').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if(!b) return;
+      
+      const tab = b.dataset.tab;
+      if(tab === 'pass' && !unlocked){
+        showGlobalToast("먼저 ① 사전 테스트 4문제를 전부 맞혀 대원 자격을 획득해야 대원증 탭이 개방됩니다! 🔒");
+        return;
+      }
+      if(tab === 'resolve' && !unlockedResolve){
+        showGlobalToast("대원증 정보를 완수하고 <b>[💾 PNG로 대원증 저장]</b>을 완료해야 사건 수사에 들어갈 수 있습니다! 🔒");
+        return;
+      }
+      if(tab === 'career' && !unlockedCareer){
+        showGlobalToast("③ 사건 해결하기 증거들을 전부 취합해 <b>금고 속 보석을 최종 발견</b>해야 진로 탭이 잠금 해제됩니다! 🔒");
+        return;
+      }
+
+      document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('show'));
+      document.getElementById(tab).classList.add('show');
+      if(tab === 'pass') {
+        P.draw();
+      }
+    });
+
+    // 퀴즈 제어 컨트롤러 (4문제 구성)
+    const Q = (function(){
+      const ALL = [
+        {
+          q: '1. 범인은 창문을 깨기 위해 무엇을 사용했을까요?',
+          o: ['망치', '소시지', '돌', '주먹'],
+          a: 0,
+          why: '오른쪽 아래에 망치가 놓여져 있습니다.'
+         },
+        {
+          q: '2. 범인은 한 명이다',
+          o: ['O', 'X'],
+          a: 1,
+          why: '범인은 두 명 이상입니다.'
+        },
+        {
+          q: '3. 벽에 걸린 시계는 몇 시일까요?',
+          o: ['9:30', '3:00', '12:30', '5:00'],
+          a: 2,
+          why: '벽에 걸린 시계는 12:30을 가리키고 있습니다.'
+        },
+        {
+          q: '4. 범인은 바닥에 닿지 않기 위해 무엇을 사용했을까요?',
+          o: ['스프링', '밧줄', '사람', '공중부양'],
+          a: 1,
+          why: '범인은 밧줄에 매달려 있습니다.'
+        }
+      ];
+      
+      let queue = [], idx = 0, solved = 0;
+      const wrong = [];
+
+      function start(list){
+        queue = list.slice();
+        idx = 0;
+        solved = 0;
+        wrong.length = 0;
+        document.getElementById('qresult').innerHTML = '';
+        render();
+      }
+
+      function render(){
+        const it = ALL[queue[idx]];
+        document.getElementById('qbox').innerHTML = `
+          <div class="q">
+            <p>${it.q}</p>
+            <div class="opts">
+              ${it.o.map((o, k) => `<button onclick="Q.pick(${k}, this)">${o}</button>`).join('')}
+            </div>
+            <div class="fb" id="fb"></div>
+          </div>
+        `;
+        document.getElementById('qn').textContent = idx + 1;
+        document.getElementById('tot').textContent = queue.length;
+        document.getElementById('sc').textContent = solved;
+      }
+
+      function finish(){
+        document.getElementById('qbox').innerHTML = '';
+        const res = document.getElementById('qresult');
+        if(wrong.length === 0){
+          res.innerHTML = `
+            <div class="win">
+              🎉 4문제 모두 통과!<br>
+              <b>과학수사대 자격 인증 완료</b> — 이제 과학수사대원증를 만들 수 있어요!<br>
+              <button class="btn cyan" style="margin-top:10px" onclick="goPassport()">과학수사대원증 만들러 가기 ▶</button>
+            </div>
+          `;
+          unlock();
+        } else {
+          const w = wrong.slice();
+          res.innerHTML = `
+            <div class="toast">아직 풀리지 않은 문제가 있어요. 다시 확인하고 맞혀보세요! 💪</div>
+            <button class="btn cyan" id="rW">틀린 문제 다시 풀기 (${w.length})</button>
+            <button class="btn ghost" id="rA">처음부터 도전하기</button>
+          `;
+          document.getElementById('rW').onclick = () => start(w);
+          document.getElementById('rA').onclick = () => start([...ALL.keys()]);
+        }
+      }
+
+      return {
+        reset() {
+          start([...ALL.keys()]);
+        },
+        pick(k, b) {
+          [...b.parentNode.children].forEach(x => x.disabled = true);
+          const qi = queue[idx];
+          const it = ALL[qi];
+          const fb = document.getElementById('fb');
+          
+          if(k === it.a){
+            b.classList.add('right');
+            fb.textContent = '✓ ' + it.why;
+            solved++;
+          } else {
+            b.classList.add('wrong');
+            [...b.parentNode.children][it.a].classList.add('right');
+            fb.textContent = '✗ ' + it.why;
+            if(!wrong.includes(qi)) wrong.push(qi);
+          }
+          
+          document.getElementById('sc').textContent = solved;
+          
+          setTimeout(() => {
+            if(idx < queue.length - 1){
+              idx++;
+              render();
+            } else {
+              finish();
+            }
+          }, 1200);
+        }
+      };
+    })();
+
+    Q.reset();
+
+    /* 대원증 모듈 정의 */
+    const P = (function(){
+      const cvs = document.getElementById('pcanvas'), ctx = cvs.getContext('2d');
+      const W = 660, H = 900;
+      
+      const THEMES = [
+        { border: '#0284c7', header: '#0369a1', light: '#e0f2fe', g1: '#ffffff', g2: '#f0f9ff', line: '#bae6fd' }, 
+        { border: '#7c3aed', header: '#6d28d9', light: '#f5f3ff', g1: '#ffffff', g2: '#faf5ff', line: '#ddd6fe' }, 
+        { border: '#16a34a', header: '#15803d', light: '#f0fdf4', g1: '#ffffff', g2: '#f0fdf4', line: '#bbf7d0' }, 
+        { border: '#ea580c', header: '#c2410c', light: '#fff7ed', g1: '#ffffff', g2: '#fff7ed', line: '#fed7aa' }  
+      ];
+      
+      const EMOJIS = ['🧑‍🚀','👩‍🚀','👨‍🚀','🧑‍🔬','👩‍🔬','👨‍🔬','🕵️','🔎','🧪','🧬','📱','💻','🤖','🦊','🐱','🦁','🐼','🦄','🔬','🩻'];
+      let theme = 0, emoji = '🧑‍🔬', mode = 'emoji', img = null, stream = null;
+
+      function buildUI(){
+        document.getElementById('themes').innerHTML = THEMES.map((t, i) =>
+          `<button class="${i === theme ? 'on' : ''}" style="background:${t.border}" onclick="P.theme(${i})"></button>`
+        ).join('');
+        
+        document.getElementById('emojis').innerHTML = EMOJIS.map(e =>
+          `<button class="${e === emoji && mode === 'emoji' ? 'on' : ''}" onclick="P.emoji('${e}')">${e}</button>`
+        ).join('');
+      }
+
+      function rr(x, y, w, h, r){
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      function v(id){
+        return document.getElementById(id).value;
+      }
+
+      function fit(t, maxw){
+        ctx.save();
+        ctx.font = "bold 24px 'Noto Sans KR', sans-serif";
+        let s = t;
+        while(ctx.measureText(s).width > maxw && s.length > 1){
+          s = s.slice(0, -1);
+        }
+        if(s !== t) s = s.slice(0, -1) + '…';
+        ctx.restore();
+        return s;
+      }
+
+      function draw(){
+        const T = THEMES[theme];
+        ctx.clearRect(0, 0, W, H);
+        
+        const m = 14;
+        rr(m, m, W - 2 * m, H - 2 * m, 34);
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, T.g1);
+        g.addColorStop(1, T.g2);
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = T.border;
+        ctx.stroke();
+        
+        ctx.save();
+        rr(m, m, W - 2 * m, H - 2 * m, 34);
+        ctx.clip();
+
+        ctx.fillStyle = T.header;
+        ctx.textBaseline = 'middle';
+        ctx.font = "bold 32px 'Noto Sans KR', sans-serif";
+        ctx.textAlign = 'left';
+        ctx.fillText('AI 과학수사대', 46, 66);
+        
+        ctx.font = "bold 18px 'Noto Sans KR', sans-serif";
+        ctx.fillText('ID CARD', 50, 104);
+        
+        ctx.fillStyle = T.header;
+        rr(W - 150, 46, 104, 40, 20);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "bold 20px 'Noto Sans KR', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.fillText('CSI', W - 98, 66);
+        
+        ctx.strokeStyle = T.line;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(46, 128);
+        ctx.lineTo(W - 46, 128);
+        ctx.stroke();
+
+        const fx = 180, fy = 158, fs = 300;
+        ctx.save();
+        rr(fx, fy, fs, fs, 28);
+        ctx.clip();
+        ctx.fillStyle = T.light;
+        ctx.fillRect(fx, fy, fs, fs);
+        
+        if(mode === 'photo' && img){
+          const b = v('sBri') / 100, c = v('sCon') / 100, s = v('sSat') / 100;
+          ctx.filter = `brightness(${b}) contrast(${c}) saturate(${s})`;
+          const ar = img.width / img.height;
+          let dw, dh;
+          if(ar > 1){
+            dh = fs;
+            dw = fs * ar;
+          } else {
+            dw = fs;
+            dh = fs / ar;
+          }
+          ctx.drawImage(img, fx + (fs - dw) / 2, fy + (fs - dh) / 2, dw, dh);
+          ctx.filter = 'none';
+        } else {
+          ctx.font = "160px serif";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(emoji, fx + fs / 2, fy + fs / 2 + 10);
+        }
+        ctx.restore();
+        
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = T.border;
+        rr(fx, fy, fs, fs, 28);
+        ctx.stroke();
+
+        const name = v('iName') || '____';
+        const team = v('iTeam') || '____';
+        const role = v('iRole');
+        const rows = [
+          ['이름', name],
+          ['소속', team],
+          ['전문 분야', role],
+        ];
+        
+        let y = 520;
+        ctx.textBaseline = 'middle';
+        
+        rows.forEach(r => {
+          ctx.textAlign = 'left';
+          ctx.fillStyle = T.border;
+          ctx.font = "bold 20px 'Noto Sans KR', sans-serif";
+          ctx.fillText(r[0], 52, y);
+          
+          ctx.fillStyle = T.header;
+          ctx.font = "bold 24px 'Noto Sans KR', sans-serif";
+          ctx.fillText(fit(r[1], 410), 205, y);
+          
+          ctx.strokeStyle = T.line;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(200, y + 22);
+          ctx.lineTo(W - 52, y + 22);
+          ctx.stroke();
+          y += 68;
+        });
+
+        const code = String(Math.abs([...name + team].reduce((a, ch) => a * 31 + ch.charCodeAt(0), 7)) % 10000).padStart(4, '0');
+        ctx.fillStyle = '#ffffff';
+        rr(52, y + 6, W - 104, 72, 16);
+        ctx.fill();
+        ctx.fillStyle = T.header;
+        
+        let bx = 78;
+        for(let i = 0; i < 46; i++){
+          const bw = (i * 7 % 3) + 2;
+          ctx.fillRect(bx, y + 20, bw, 30);
+          bx += bw + 3;
+          if(bx > W - 210) break;
+        }
+        ctx.font = "bold 20px 'Noto Sans KR', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.fillText('AI 과학수사대-2026-' + code, W / 2, y + 62);
+        
+        ctx.restore();
+      }
+
+      // 최종보고서 인쇄용: ID카드 전체가 아니라 '사진/이모지가 들어가는 영역'만 정확히 잘라서
+      // 별도의 캔버스에 그린 뒤 그 부분만 이미지로 반환합니다.
+      // (이전에는 전체 ID카드(pcanvas)를 그대로 캡쳐해서 작은 보고서 사진란에 넣었기 때문에,
+      //  사진 업로드/카메라 촬영 모드에서 얼굴 사진이 아니라 카드 전체가 찌그러져 보이는 문제가 있었습니다.)
+      function avatarDataURL(){
+        if(mode !== 'photo' || !img){
+          return null; // 이모지 모드이거나 사진이 없는 경우: 호출하는 쪽에서 이모지로 대체 처리
+        }
+        const sz = 300;
+        const off = document.createElement('canvas');
+        off.width = sz;
+        off.height = sz;
+        const octx = off.getContext('2d');
+
+        // NaN 방어: 슬라이더 값이 비어있거나 비정상인 경우 기본값으로 대체
+        const bRaw = parseFloat(v('sBri')), cRaw = parseFloat(v('sCon')), sRaw = parseFloat(v('sSat'));
+        const b = isNaN(bRaw) ? 1 : bRaw / 100;
+        const c = isNaN(cRaw) ? 1 : cRaw / 100;
+        const s = isNaN(sRaw) ? 1 : sRaw / 100;
+        octx.filter = `brightness(${b}) contrast(${c}) saturate(${s})`;
+        const ar = img.width / img.height;
+        let dw, dh;
+        if(ar > 1){
+          dh = sz;
+          dw = sz * ar;
+        } else {
+          dw = sz;
+          dh = sz / ar;
+        }
+        octx.drawImage(img, (sz - dw) / 2, (sz - dh) / 2, dw, dh);
+        octx.filter = 'none';
+
+        try {
+          return off.toDataURL('image/png');
+        } catch(err) {
+          console.error('대원증 사진 추출 실패 (오프스크린 캔버스)', err);
+          // fallback: pcanvas(대원증 전체 캔버스)에서 사진 영역만 잘라서 반환
+          try {
+            const fx = 180, fy = 158, fs = 300;
+            const fb = document.createElement('canvas');
+            fb.width = fs;
+            fb.height = fs;
+            const fctx = fb.getContext('2d');
+            fctx.drawImage(cvs, fx, fy, fs, fs, 0, 0, fs, fs);
+            return fb.toDataURL('image/png');
+          } catch(err2) {
+            console.error('대원증 사진 추출 최종 실패', err2);
+            return null;
+          }
+        }
+      }
+
+      return {
+        init() {
+          buildUI();
+          
+          document.getElementById('iPhoto').addEventListener('change', e => {
+            const f = e.target.files[0];
+            if(!f) return;
+            const r = new FileReader();
+            r.onload = () => {
+              const im = new Image();
+              im.onload = () => {
+                img = im;
+                mode = 'photo';
+                document.getElementById('sBri').value = 100;
+                document.getElementById('sCon').value = 100;
+                document.getElementById('sSat').value = 100;
+                buildUI();
+                draw();
+              };
+              im.src = r.result;
+            };
+            r.readAsDataURL(f);
+          });
+          
+          if(document.fonts && document.fonts.ready){
+            document.fonts.ready.then(draw);
+          }
+          draw();
+        },
+        draw,
+        theme(i) {
+          theme = i;
+          buildUI();
+          draw();
+        },
+        emoji(e) {
+          emoji = e;
+          mode = 'emoji';
+          buildUI();
+          draw();
+        },
+        useEmoji() {
+          mode = 'emoji';
+          buildUI();
+          draw();
+        },
+        auto() {
+          document.getElementById('sBri').value = 106;
+          document.getElementById('sCon').value = 112;
+          document.getElementById('sSat').value = 118;
+          draw();
+        },
+        async cam() {
+          const box = document.getElementById('camBox'), msg = document.getElementById('camMsg');
+          box.style.display = 'block';
+          msg.textContent = '카메라를 활성화하는 중…';
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+            document.getElementById('cam').srcObject = stream;
+            msg.textContent = '얼굴이 화면 중앙에 오면 "찰칵!" 버튼을 눌러요. 😊';
+          } catch(err) {
+            msg.textContent = '카메라 작동 불가: 카메라 사용 권한을 허용해 주시거나 https 환경에서 재접속 해주세요.';
+          }
+        },
+        snap() {
+          const video = document.getElementById('cam');
+          if(!video.videoWidth){
+            document.getElementById('camMsg').textContent = '카메라 신호가 약합니다. 잠시 후 촬영해 주세요.';
+            return;
+          }
+          const sz = Math.min(video.videoWidth, video.videoHeight);
+          const t = document.createElement('canvas');
+          t.width = sz;
+          t.height = sz;
+          const tc = t.getContext('2d');
+          tc.translate(sz, 0);
+          tc.scale(-1, 1);
+          tc.drawImage(video, (video.videoWidth - sz) / 2, (video.videoHeight - sz) / 2, sz, sz, 0, 0, sz, sz);
+          
+          const im = new Image();
+          im.onload = () => {
+            img = im;
+            mode = 'photo';
+            document.getElementById('sBri').value = 100;
+            document.getElementById('sCon').value = 100;
+            document.getElementById('sSat').value = 100;
+            buildUI();
+            draw();
+          };
+          im.src = t.toDataURL('image/png');
+          this.closeCam();
+        },
+        closeCam() {
+          if(stream){
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+          }
+          document.getElementById('camBox').style.display = 'none';
+        },
+        save() {
+          const name = (document.getElementById('iName').value || '크루').trim();
+          const a = document.createElement('a');
+          a.download = 'AI과학수사대_' + name + '.png';
+          a.href = cvs.toDataURL('image/png');
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          
+          // 대원증 저장 시 [③ 사건 해결하기] 탭 잠금 해제 기능 연동
+          if(!unlockedResolve) {
+            unlockedResolve = true;
+            const nr = document.getElementById('navResolve');
+            nr.classList.remove('locked');
+            nr.textContent = '🔍 ③ 사건 해결하기';
+            showGlobalToast("🎫 대원증 저장 성공! <b>[③ 사건 해결하기]</b> 탭이 활성화되었습니다.");
+          }
+        },
+        getAvatarInfo() {
+          return {
+            mode: mode,
+            emoji: emoji,
+            img: img,
+            theme: THEMES[theme]
+          };
+        },
+        avatarDataURL
+      };
+    })();
+
+    P.init();
+
+    // -----------------------------------------------------
+    // ③ 사건 해결하기 증거 1 ~ 증거 4 컨트롤러 로직    // -----------------------------------------------------
+    let selectedTshirtLabel = null;
+    let selectedSuspectsE1 = [];
+    let selectedSuspectsE2 = [];
+    let finalCulprit = null;
+    
+    // 증거 2 족적 선형회귀 기준 용의자 신장 정보 목록
+    const SUSPECT_HEIGHTS = {
+      'A': 183,
+      'B': 179,
+      'C': 168,
+      'D': 175,
+      'E': 160
+    };
+
+    // 증거 1: 티셔츠 클릭
+    function selectTshirt(label, element) {
+      document.querySelectorAll('.tshirt-card').forEach(card => {
+        card.classList.remove('selected', 'luminol');
+      });
+      element.classList.add('selected');
+      selectedTshirtLabel = label;
+
+      const f = document.getElementById('tshirtFeedback');
+      const suspectArea = document.getElementById('evidence1SuspectArea');
+
+      if (label === 'B') {
+        element.classList.add('luminol');
+        f.innerHTML = "<span style='color:var(--green); font-weight:700;'>✓ 정답! 루미놀 반응 결과, 티셔츠 B에서 청백색의 화학 발광이 강하게 일어났습니다. 혈흔이 나타난 티셔츠는 박물관 100주년 기념 한정 티셔츠로 박물관 직원과 정기 회원에게만 제공되었습니다.</span>";
+        // 올바른 단서 문장이 노출된 후에만 하위 용의자 조사 영역 활성화
+        suspectArea.style.display = 'block';
+        suspectArea.scrollIntoView({ behavior: 'smooth' });
+      } else if (label === 'A') {
+        f.innerHTML = "<span style='color:var(--red); font-weight:700;'>✗ 오답: 단순 세탁세제에 함유된 형광증백제 성분 검출 반응입니다.</span>";
+        suspectArea.style.display = 'none';
+      } else {
+        f.innerHTML = "<span style='color:var(--red); font-weight:700;'>✗ 오답: 이 흔적은 과일 주스가 굳어 생성된 과즙 얼룩입니다.</span>";
+        suspectArea.style.display = 'none';
+      }
+    }
+
+    // 증거 1, 2 용의자 다중선택
+    function toggleSuspect(evidenceKey, suspectChar) {
+      const parentId = `suspects${evidenceKey}`;
+      const list = evidenceKey === 'E1' ? selectedSuspectsE1 : selectedSuspectsE2;
+      
+      const idx = list.indexOf(suspectChar);
+      if (idx > -1) {
+        list.splice(idx, 1);
+      } else {
+        list.push(suspectChar);
+      }
+
+      const btns = document.querySelectorAll(`#${parentId} .suspect-btn`);
+      const suspectMapping = ['A', 'B', 'C', 'D', 'E'];
+      btns.forEach((btn, i) => {
+        if (list.includes(suspectMapping[i])) {
+          btn.classList.add('checked');
+        } else {
+          btn.classList.remove('checked');
+        }
+      });
+
+      const feedback = document.getElementById(`${evidenceKey.toLowerCase()}Feedback`);
+      if (evidenceKey === 'E1') {
+        // 혈흔 감식 용의자
+        const isA = list.includes('A');
+        const isB = list.includes('B');
+        const isD = list.includes('D');
+        if (isA && isB && isD && list.length === 3) {
+          feedback.innerHTML = "<span style='color:var(--green); font-weight:700;'>✓ 확인 결과 티셔츠 배포 기록과 일치합니다. </span>";
+        } else {
+          feedback.innerHTML = "<span style='color:var(--dim);'>추가 용의자를 지목해보세요 (의심 인물 총 3명).</span>";
+        }
+      } else {
+        // 족적 키: 학생이 입력창에 입력한 키 값을 기준으로 실시간 검증 (+3cm ~ -3cm 범위)
+        // 선형회귀식은 외부 사이트에서 학생이 직접 구하므로, 여기서는 그 결과값(calcHeight)만 가지고
+        // 5명의 용의자 키와 비교하여 매칭 여부를 판단합니다.
+        const typedHeight = parseFloat(document.getElementById('calcHeight').value.trim());
+        if (isNaN(typedHeight)) {
+          feedback.innerHTML = "<span style='color:var(--red); font-weight:700;'>위 입력창에 직접 구한 선형회귀식으로 계산한 예상 키를 먼저 입력하세요!</span>";
+          return;
+        }
+
+        // 입력된 키 기준 ±3 범위에 해당하는 실제 용의자 필터링
+        const validSuspects = [];
+        for (const [suspect, h] of Object.entries(SUSPECT_HEIGHTS)) {
+          if (h >= typedHeight - 3 && h <= typedHeight + 3) {
+            validSuspects.push(suspect);
+          }
+        }
+
+        // 입력한 키(±3cm)가 5명의 용의자 키 범위를 모두 벗어나 해당하는 용의자가 단 한 명도 없는 경우에만
+        // 선형회귀식을 다시 구하라는 안내 메시지를 표시합니다.
+        if (validSuspects.length === 0) {
+          feedback.innerHTML = "<span style='color:var(--red); font-weight:700;'>✗ 입력하신 키 값(±3cm 범위)에 해당하는 용의자가 한 명도 없습니다. 외부 사이트에서 선형회귀식을 다시 구해 보세요!</span>";
+          return;
+        }
+
+        // 학생이 선택한 용의자들의 배열(list)이 위 조건 충족 그룹(validSuspects)과 완벽하게 똑같이 선택되었는지 체크
+        const isMatch = list.length === validSuspects.length && list.every(val => validSuspects.includes(val));
+
+        if (isMatch) {
+          const namesStr = validSuspects.map(char => `용의자 ${char}`).join(', ');
+          feedback.innerHTML = `<span style='color:var(--green); font-weight:700;'>✓ 입력하신 키 ${typedHeight}cm의 오차범위(±3cm, 즉 ${Math.round((typedHeight - 3)*10)/10}cm ~ ${Math.round((typedHeight + 3)*10)/10}cm)에 부합하는 용의자는 ${namesStr}입니다!</span>`;
+        } else {
+          const rangeMin = Math.round((typedHeight - 3)*10)/10;
+          const rangeMax = Math.round((typedHeight + 3)*10)/10;
+          feedback.innerHTML = `<span style='color:var(--dim);'>계산된 예상 키 ${typedHeight}cm의 오차범위인 ${rangeMin}cm ~ ${rangeMax}cm 사이에 위치하는 모든 용의자를 골라보세요.</span>`;
+        }
+      }
+    }
+
+    // 증거 2 키 입력 실시간 유효성 체크
+    // (선형회귀식은 외부 사이트(CODAP)에서 학생이 직접 구하므로, 이 웹앱에서는 정답 공식을 강제하지 않고
+    //  입력된 값이 사람의 키로 합리적인 범위인지만 확인합니다.)
+    function checkHeight() {
+      const val = document.getElementById('calcHeight').value.trim();
+      const fb = document.getElementById('heightFeedback');
+      const num = parseFloat(val);
+
+      if (val === '') {
+        fb.innerHTML = "";
+        return;
+      }
+
+      if (isNaN(num)) {
+        fb.innerHTML = "<span style='color:var(--red);'>올바른 숫자를 입력해 주십시오.</span>";
+        return;
+      }
+
+      if (num < 100 || num > 250) {
+        fb.innerHTML = "<span style='color:var(--amber); font-weight:500;'>사람의 평균적인 키 범위를 벗어난 값입니다. 직접 구한 선형회귀식의 계산 과정을 다시 확인해 보세요.</span>";
+      } else {
+        fb.innerHTML = `<span style='color:var(--green); font-weight:700;'>✓ 입력 완료! 직접 구한 선형회귀식으로 추정한 범인의 키는 약 ${num}cm입니다. 이제 아래에서 ±3cm 범위 내에 있는 용의자들을 지목하세요!</span>`;
+      }
+
+      // 입력값이 바뀔 때마다 아래 용의자 체크 상태 피드백도 실시간 업데이트 리셋
+      if (selectedSuspectsE2.length > 0) {
+        // 이미 눌러둔 버튼이 있다면 피드백 자동 재평가 트리거
+        toggleSuspect('E2', ''); 
+        selectedSuspectsE2.pop(); // 공백 임시 요소 보정
+      }
+    }
+
+    // 증거 3 단일 범인 선택
+    function selectFinalCulprit(char) {
+      finalCulprit = char;
+      const btns = document.querySelectorAll('#suspectsE3 .suspect-btn');
+      const mapping = ['A', 'B', 'C', 'D', 'E'];
+      btns.forEach((btn, i) => {
+        if (mapping[i] === char) {
+          btn.classList.add('checked');
+        } else {
+          btn.classList.remove('checked');
+        }
+      });
+
+      const fb = document.getElementById('e3Feedback');
+      if (char === 'B') {
+        fb.innerHTML = "<span style='color:var(--green); font-weight:700;'>✓ 사건 현장 혈흔의 STR 분석 결과와 일치하는 인물은 용의자 B입니다!</span>";
+      } else {
+        fb.innerHTML = `<span style='color:var(--red); font-weight:700;'>✗ 지목한 용의자의 STR 분석 결과가 다릅니다.</span>`;
+      }
+    }
+
+    // 증거 4 암호 검증
+    function checkCipher() {
+      const val = document.getElementById('cipherText').value.toUpperCase().trim();
+      const fb = document.getElementById('cipherFeedback');
+      if (val === 'COFFIN') {
+        fb.innerHTML = "<span style='color:var(--green); font-weight:700;'>✓ 복호화 성공! 복구된 영단어는 'COFFIN'(관)입니다. 이제 정답 이미지를 클릭해 보세요!</span>";
+      } else if (val === '') {
+        fb.innerHTML = "";
+      } else {
+        fb.innerHTML = "<span style='color:var(--red);'>✗ 해독 실패: 다른 알파벳을 추정해 보세요. (힌트: 주기율표의 원자 번호에 해당하는 원소 기호)</span>";
+      }
+    }
+
+    // 보석 발견 시 [④ 과학수사관 어때?] 해제
+    function unlockCareer() {
+      if(!unlockedCareer) {
+        unlockedCareer = true;
+        const nc = document.getElementById('navCareer');
+        nc.classList.remove('locked');
+        nc.textContent = '🎓 ④ 과학수사관 어때?';
+        showGlobalToast("💎 보석 회수 성공! <b>[④ 과학수사관 어때?]</b> 탭이 활성화되었습니다.");
+      }
+    }
+
+    // 금고 뒤집기 플립
+    function flipSafe(num, element) {
+      element.classList.toggle('flipped');
+      const fb = document.getElementById('safeFeedback');
+      if (num === 2) {
+        fb.innerHTML = "<span style='color:var(--green); font-weight:700;'>🎉 도난당한 Hope Diamond 보석을 안전하게 회수했습니다! 사건 종결!</span>";
+        unlockCareer();
+      } else {
+        fb.innerHTML = "<span style='color:var(--red);'>보석이 숨겨진 장소가 아닙니다. 다른 곳을 찾아보세요!</span>";
+      }
+    }
+
+    // -----------------------------------------------------
+    // [④ 과학수사관 어때?] 적성 테스트 제어 로직
+    // -----------------------------------------------------
+    let surveyAnswers = [0, 0, 0, 0];
+
+    function scoreSurvey(qIndex, score, element) {
+      surveyAnswers[qIndex] = score;
+      const parent = element.parentNode;
+      const btns = parent.querySelectorAll('button');
+      btns.forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function calculateCareerScore() {
+      const answeredCount = surveyAnswers.filter(a => a > 0).length;
+      const resultBox = document.getElementById('surveyResult');
+
+      if (answeredCount < 4) {
+        resultBox.innerHTML = `
+          <div class="toast">아직 누락된 문항이 있습니다. 4개 적성 테스트 질문을 모두 선택해 주세요!</div>
+        `;
+        return;
+      }
+
+      const totalScore = surveyAnswers.reduce((sum, current) => sum + current, 0);
+      let title = "";
+      let desc = "";
+      let styleCss = "";
+
+      if (totalScore >= 15) {
+        title = "🧬 찰떡궁합 과학수사관! (" + totalScore + "점 / 20점)";
+        desc = "호기심과 논리력, 끈기까지 고루 갖춘 당신은 과학수사 연구 인재나 명예 요원으로 활약하기에 최적화된 우수한 자질을 갖고 있습니다!";
+        styleCss = "background: rgba(34, 197, 94, 0.1); border: 2px solid var(--green); color: #15803d;";
+      } else if (totalScore >= 9) {
+        title = "🔍 조금 더 노력이 필요해! (" + totalScore + "점 / 20점)";
+        desc = "관심과 호기심은 갖추었으나 끈기 있게 미세한 단서들을 비교하는 체력과 역량을 조금 더 키운다면 멋진 요원으로 성장 가능성이 있습니다.";
+        styleCss = "background: rgba(245, 158, 11, 0.1); border: 2px solid var(--amber); color: #b45309;";
+      } else {
+        title = "💡 다른 직업도 많잖아? (" + totalScore + "점 / 20점)";
+        desc = "고된 현장 분석이나 통계 모델 수립 대신, 고정관념에서 벗어나 본인만의 창의적인 능력을 발휘할 수 있는 진로가 더욱 적합할 수 있습니다!";
+        styleCss = "background: rgba(239, 68, 68, 0.1); border: 2px solid var(--red); color: #b91c1c;";
+      }
+
+      resultBox.innerHTML = `
+        <div style="padding: 18px; border-radius: 12px; font-weight: 700; line-height: 1.6; animation: pop 0.3s; ${styleCss}">
+          <div style="text-align: center; font-size: 1.1rem; margin-bottom: 8px;"><strong>${title}</strong></div>
+          <div style="font-weight: 500; font-size: 0.92rem; text-align: left; word-break: keep-all; line-height: 1.5;">${desc}</div>
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // ★ 실시간 보고서 데이터 전송 및 인쇄 기능 ★
+    // ==========================================
+    function prepareAndPrintReport() {
+      // 1. 대원증 정보 매핑
+      const name = (document.getElementById('iName').value || '미입력 수사관').trim();
+      const team = (document.getElementById('iTeam').value || 'OO 중학교').trim();
+      const role = document.getElementById('iRole').value;
+      
+      document.getElementById('print-name').textContent = name;
+      document.getElementById('print-team').textContent = team;
+      document.getElementById('print-role').textContent = role;
+
+      // 2. 대원증 아바타(이모지/사진) 타입 동기화 & 복사
+      //    이모지 / 사진 업로드 / 카메라 촬영 중 어떤 방식으로 대원증을 만들었는지와 상관없이
+      //    보고서에 항상 정상적으로 출력되도록 처리합니다.
+      //    (기존에는 사진 모드일 때 ID카드 전체를 캡쳐해 작은 사진란에 끼워 넣다 보니
+      //     얼굴 사진이 아니라 카드 전체가 찌그러져 보이는 문제가 있었습니다. 이제는
+      //     얼굴 사진 영역만 별도로 정확히 추출하여 사용합니다.)
+      const avatarInfo = P.getAvatarInfo();
+      const printImg = document.getElementById('print-id-card-img');
+      const printEmoji = document.getElementById('print-emoji-avatar');
+      const imgContainer = document.querySelector('.print-id-card-img-container');
+
+      function showEmojiAvatarOnReport() {
+        printImg.style.display = 'none';
+        printImg.removeAttribute('src');
+        printEmoji.style.display = 'block';
+        printEmoji.textContent = avatarInfo.emoji;
+        imgContainer.style.background = avatarInfo.theme.light;
+        imgContainer.style.borderColor = avatarInfo.theme.border;
+        imgContainer.style.display = 'flex';
+        imgContainer.style.alignItems = 'center';
+        imgContainer.style.justifyContent = 'center';
+      }
+
+      if (avatarInfo.mode === 'photo') {
+        // 사진 업로드 또는 카메라 촬영 모드: 얼굴 사진 영역만 정확히 추출해서 출력
+        const photoData = P.avatarDataURL();
+        if (photoData) {
+          printEmoji.style.display = 'none';
+          imgContainer.style.background = '#ffffff';
+          imgContainer.style.borderColor = '#cbd5e1';
+          printImg.style.display = 'block';
+          // 이미지가 완전히 로드된 뒤 src 설정 (브라우저 렌더링 타이밍 보장)
+          printImg.onload = null;
+          printImg.src = photoData;
+        } else {
+          // 예상치 못한 사유로 사진 데이터를 가져오지 못한 경우, 이모지로 안전하게 대체 출력
+          showEmojiAvatarOnReport();
+        }
+      } else {
+        // 이모지 모드일 때: 고화질 이모지 텍스트 출력
+        showEmojiAvatarOnReport();
+      }
+
+      // 3. 사전테스트 결과 반영
+      if (unlocked) {
+        document.getElementById('print-quiz-score').innerHTML = `<span class="print-success-badge">이수 완료</span> 4문제 모두 통과 (대원 자격 획득)`;
+      } else {
+        document.getElementById('print-quiz-score').innerHTML = `<span class="print-fail-badge">미완료</span> 아직 사전 퀴즈를 모두 통과하지 못했습니다.`;
+      }
+
+      // 4. 사건 수사 증거 결과 실시간 반영
+      // [증거 1] 혈흔 감식
+      const statusE1 = document.getElementById('print-status-e1');
+      if (selectedTshirtLabel === 'B') {
+        statusE1.innerHTML = `<span class="print-success-badge">분석 완료</span>`;
+      } else {
+        statusE1.innerHTML = `<span class="print-fail-badge">대기 중</span>`;
+      }
+
+      // [증거 2] 족적 분석
+      const statusE2 = document.getElementById('print-status-e2');
+      const heightVal = document.getElementById('calcHeight').value.trim();
+      const numHeight = parseFloat(heightVal);
+      if (!isNaN(numHeight) && heightVal !== '') {
+        statusE2.innerHTML = `<span class="print-success-badge">추론 완료</span>`;
+        document.getElementById('print-height-val').textContent = numHeight;
+      } else {
+        statusE2.innerHTML = `<span class="print-fail-badge">대기 중</span>`;
+        document.getElementById('print-height-val').textContent = '___';
+      }
+
+      // [증거 3] DNA STR 분석
+      const statusE3 = document.getElementById('print-status-e3');
+      if (finalCulprit === 'B') {
+        statusE3.innerHTML = `<span class="print-success-badge">검거 성공</span>`;
+      } else {
+        statusE3.innerHTML = `<span class="print-fail-badge">대기 중</span>`;
+      }
+
+      // [증거 4] 암호 해독 및 보석
+      const statusE4 = document.getElementById('print-status-e4');
+      const cipher = document.getElementById('cipherText').value.toUpperCase().trim();
+      if (cipher === 'COFFIN' && unlockedCareer) {
+        statusE4.innerHTML = `<span class="print-success-badge">회수 완료</span>`;
+      } else {
+        statusE4.innerHTML = `<span class="print-fail-badge">대기 중</span>`;
+      }
+
+      // 5. 적성 검사 결과 연동
+      const answeredCount = surveyAnswers.filter(a => a > 0).length;
+      const printCareerTitle = document.getElementById('print-career-title');
+      const printCareerDesc = document.getElementById('print-career-desc');
+
+      if (answeredCount < 4) {
+        printCareerTitle.textContent = "📝 적성 진단 미완료";
+        printCareerDesc.textContent = "진로 자가 적성 테스트 문항을 모두 완료하면 본인의 진단 조언서가 이곳에 실시간으로 인쇄됩니다.";
+      } else {
+        const totalScore = surveyAnswers.reduce((sum, current) => sum + current, 0);
+        if (totalScore >= 15) {
+          printCareerTitle.textContent = "🧬 찰떡궁합 과학수사관! (" + totalScore + "점 / 20점)";
+          printCareerDesc.textContent = "호기심과 논리력, 끈기까지 고루 갖춘 당신은 과학수사 연구 인재나 명예 요원으로 활약하기에 최적화된 우수한 자질을 갖고 있습니다!";
+        } else if (totalScore >= 9) {
+          printCareerTitle.textContent = "🔍 조금 더 노력이 필요해! (" + totalScore + "점 / 20점)";
+          printCareerDesc.textContent = "관심과 호기심은 갖추었으나 끈기 있게 미세한 단서들을 비교하는 체력과 역량을 조금 더 키운다면 멋진 요원으로 성장 가능성이 있습니다.";
+        } else {
+          printCareerTitle.textContent = "💡 다른 직업도 많잖아? (" + totalScore + "점 / 20점)";
+          printCareerDesc.textContent = "고된 현장 분석이나 통계 모델 수립 대신, 고정관념에서 벗어나 본인만의 창의적인 능력을 발휘할 수 있는 진로가 더욱 적합할 수 있습니다!";
+        }
+      }
+
+      // 6. 인쇄 대화상자 호출 (사진 모드일 경우 이미지 로드 완료 후 인쇄)
+      const printImg2 = document.getElementById('print-id-card-img');
+      if (printImg2.style.display !== 'none' && printImg2.src && !printImg2.complete) {
+        printImg2.onload = () => { printImg2.onload = null; window.print(); };
+        printImg2.onerror = () => { printImg2.onerror = null; window.print(); };
+      } else {
+        window.print();
+      }
+    }
+  </script>
+</body>
+</html>
